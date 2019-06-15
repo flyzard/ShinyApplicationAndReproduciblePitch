@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Course Project: Shiny Application and Reproducible Pitch</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Course Project: Shiny Application and Reproducible Pitch">
+  <meta name="author" content="Joao Felizardo">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Course Project: Shiny Application and Reproducible Pitch</h1>
+    <h2>Red wine quality playout</h2>
+    <p>Joao Felizardo<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <article data-timings="">
+    <style type="text/css">
+code {     
+  font-size: 12px;
+}
+.eda article p {
+  font-size: 14px;
+}
+</style>
+
+<h2>Introduction</h2>
+
+<p>This document serves the purpose of pitching the app <a href="https://felizardo.shinyapps.io/ShinyApplicationAndReproduciblePitch/">ShinyApplicationAndReproduciblePitch</a>. </p>
+
+<p>In this Shiny app, I am showing the influence of the some wine chemical compounds on the wine quality classification.</p>
+
+<p>The data set can be found in <a href="https://www.kaggle.com/sgus1318/winedata">https://www.kaggle.com/sgus1318/winedata</a>. </p>
+
+<p>** Please be aware that this study serves nothing else as the work for the Course Project. No further conclusion should be taken from this work. **</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="imp" id="imp" style="background:;">
+  <hgroup>
+    <h2>Importing data</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r"># Importing data
+df = read.csv(&quot;https://raw.githubusercontent.com/flyzard/ShinyApplicationAndReproduciblePitch/master/winequality-red.csv&quot;)
+# Showing the structure of the data
+summary(df)
+</code></pre>
+
+<pre><code>##  fixed.acidity   volatile.acidity  citric.acid    residual.sugar  
+##  Min.   : 4.60   Min.   :0.1200   Min.   :0.000   Min.   : 0.900  
+##  1st Qu.: 7.10   1st Qu.:0.3900   1st Qu.:0.090   1st Qu.: 1.900  
+##  Median : 7.90   Median :0.5200   Median :0.260   Median : 2.200  
+##  Mean   : 8.32   Mean   :0.5278   Mean   :0.271   Mean   : 2.539  
+##  3rd Qu.: 9.20   3rd Qu.:0.6400   3rd Qu.:0.420   3rd Qu.: 2.600  
+##  Max.   :15.90   Max.   :1.5800   Max.   :1.000   Max.   :15.500  
+##    chlorides       free.sulfur.dioxide total.sulfur.dioxide
+##  Min.   :0.01200   Min.   : 1.00       Min.   :  6.00      
+##  1st Qu.:0.07000   1st Qu.: 7.00       1st Qu.: 22.00      
+##  Median :0.07900   Median :14.00       Median : 38.00      
+##  Mean   :0.08747   Mean   :15.87       Mean   : 46.47      
+##  3rd Qu.:0.09000   3rd Qu.:21.00       3rd Qu.: 62.00      
+##  Max.   :0.61100   Max.   :72.00       Max.   :289.00      
+##     density             pH          sulphates         alcohol     
+##  Min.   :0.9901   Min.   :2.740   Min.   :0.3300   Min.   : 8.40  
+##  1st Qu.:0.9956   1st Qu.:3.210   1st Qu.:0.5500   1st Qu.: 9.50  
+##  Median :0.9968   Median :3.310   Median :0.6200   Median :10.20  
+##  Mean   :0.9967   Mean   :3.311   Mean   :0.6581   Mean   :10.42  
+##  3rd Qu.:0.9978   3rd Qu.:3.400   3rd Qu.:0.7300   3rd Qu.:11.10  
+##  Max.   :1.0037   Max.   :4.010   Max.   :2.0000   Max.   :14.90  
+##     quality     
+##  Min.   :3.000  
+##  1st Qu.:5.000  
+##  Median :6.000  
+##  Mean   :5.636  
+##  3rd Qu.:6.000  
+##  Max.   :8.000
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="eda" id="eda" style="background:;">
+  <hgroup>
+    <h2>Exploratory data analysis</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>As we can see here, the data set has 11 discrete variables and one categorical, the <code>quality</code>.
+My goal is to find out which variables have more influence on the wine quality and then try to predict the wine quality, playing with quantity of that chemical substances. Let&#39;s find the correlation between all the variables.
+<img src="assets/fig/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="conclusion" id="conclusion" style="background:;">
+  <hgroup>
+    <h2>Conclusion</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>As shown in the plot, the variable with higher correlation with <code>quality</code> are <code>alcohol</code>, <code>volatile.acidity</code>, <code>sulphates</code> and <code>citric.acid</code>. Im going to train a model on this data set, with a <code>GLM</code> algorithm, then use this to predict the quality of a wine with some given propoerties on the Shiny app.</p>
+
+<pre><code>model &lt;- train(quality~., df, method =&quot;glm&quot;,  
+               trControl=trainControl(method = &quot;cv&quot;, number = 5, verboseIter = TRUE), na.action = na.exclude)
+
+
+
+newdata$alcohol = input$alcohol
+        newdata$volatile.acidity = input$volatile.acidity
+        newdata$sulphates = input$sulphates
+        newdata$citric.acid = input$citric.acid
+
+        pred &lt;- predict(model, newdata = newdata)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='NA'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Importing data'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Exploratory data analysis'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Conclusion'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>

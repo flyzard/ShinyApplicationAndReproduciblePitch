@@ -1,0 +1,71 @@
+---
+title       : "Course Project: Shiny Application and Reproducible Pitch"
+subtitle    : "Red wine quality playout"
+author      : "Joao Felizardo"
+date        : "15/06/2019"
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+<style type="text/css">
+code {     
+  font-size: 12px;
+}
+.eda article p {
+  font-size: 14px;
+}
+</style>
+
+## Introduction
+
+This document serves the purpose of pitching the app [ShinyApplicationAndReproduciblePitch](https://felizardo.shinyapps.io/ShinyApplicationAndReproduciblePitch/). 
+
+In this Shiny app, I am showing the influence of the some wine chemical compounds on the wine quality classification.
+
+The data set can be found in https://www.kaggle.com/sgus1318/winedata. 
+
+** Please be aware that this study serves nothing else as the work for the Course Project. No further conclusion should be taken from this work. **
+
+```{r echo=FALSE, cache=TRUE, warning=FALSE, error=FALSE}
+# Required package
+library("GGally")
+```
+
+--- .imp #imp
+## Importing data
+```{r}
+# Importing data
+df = read.csv("https://raw.githubusercontent.com/flyzard/ShinyApplicationAndReproduciblePitch/master/winequality-red.csv")
+# Showing the structure of the data
+summary(df)
+```
+
+--- .eda #eda 
+## Exploratory data analysis
+As we can see here, the data set has 11 discrete variables and one categorical, the `quality`.
+My goal is to find out which variables have more influence on the wine quality and then try to predict the wine quality, playing with quantity of that chemical substances. Let's find the correlation between all the variables.
+```{r echo=FALSE}
+ggcorr(df, label = TRUE)
+```
+
+--- .conclusion #conclusion
+## Conclusion
+As shown in the plot, the variable with higher correlation with `quality` are `alcohol`, `volatile.acidity`, `sulphates` and `citric.acid`. Im going to train a model on this data set, with a `GLM` algorithm, then use this to predict the quality of a wine with some given propoerties on the Shiny app.
+
+```
+model <- train(quality~., df, method ="glm",  
+               trControl=trainControl(method = "cv", number = 5, verboseIter = TRUE), na.action = na.exclude)
+
+
+
+newdata$alcohol = input$alcohol
+        newdata$volatile.acidity = input$volatile.acidity
+        newdata$sulphates = input$sulphates
+        newdata$citric.acid = input$citric.acid
+        
+        pred <- predict(model, newdata = newdata)
+```

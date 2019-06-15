@@ -12,25 +12,53 @@ library(shiny)
 library(caret)
 library(ggplot2)
 
-df = read.csv("ShinyApplicationAndReproduciblePitch/winequality-red.csv")
-model <- train(quality ~ ., data = df, method = "ranger", trControl = trainControl(method = "cv", number = 5, verboseIter = TRUE))
+# Download data
+df = read.csv("https://raw.githubusercontent.com/flyzard/ShinyApplicationAndReproduciblePitch/master/winequality-red.csv")
 
+# Build model
+model <- train(quality~., df, method ="glm",  
+               trControl=trainControl(method = "cv", number = 5, verboseIter = TRUE), na.action = na.exclude)
+
+#model <- train(quality~., df, method ="ranger",  
+ #               trControl=trainControl(method = "cv", number = 5, verboseIter = TRUE), na.action = na.exclude)
+
+newdata <- data.frame(
+    "alcohol" = NA, 
+    "volatile.acidity" = NA, 
+    "sulphates" = NA, 
+    "citric.acid" = NA, 
+    "fixed.acidity" = mean(df$fixed.acidity),
+    "residual.sugar" = mean(df$residual.sugar),
+    "chlorides" = mean(df$chlorides),
+    "free.sulfur.dioxide" = mean(df$free.sulfur.dioxide),
+    "total.sulfur.dioxide" = mean(df$total.sulfur.dioxide),
+    "density" = mean(df$density),
+    "pH" = mean(df$pH))
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
 
     prediction <- reactive({
-        pred <- predict(model, newdata = data.frame(input$alcohol, input$volatile.acidity, input$sulphates, input$citric.acid))
+        newdata$alcohol = input$alcohol
+        newdata$volatile.acidity = input$volatile.acidity
+        newdata$sulphates = input$sulphates
+        newdata$citric.acid = input$citric.acid
+        
+        pred <- predict(model, newdata = newdata)
         pred
     })
     
     similars <- reactive({
-        sim <- filter(df, 
-            (alcohol < input$alcohol + 0.5 | alcohol > input$alcohol - 0.5),
-            (volatile.acidity < input$volatile.acidity + 0.05 | volatile.acidity > input$volatile.acidity - 0.05), 
-            (sulphates < input$sulphates + 0.08 | sulphates > input$sulphates - 0.08), 
-            (citric.acid < input$citric.acid + 0.05 | citric.acid > input$citric.acid - 0.05)
-        )
+        alcohol = input$alcohol
+        v.acidity = input$volatile.acidity
+        sulphates = input$sulphates
+        c.acid = input$citric.acid
+        
+        sim <- df[(between(df$alcohol, alcohol-1, alcohol+1) 
+                   & between(df$volatile.acidity, v.acidity -0.5, v.acidity +0.5)
+                   & between(df$sulphates, sulphates -0.5, sulphates +0.5)
+                   & between(df$citric.acid, c.acid -0.5, c.acid +0.5)),]
+        
         sim
     })
 
@@ -41,14 +69,14 @@ shinyServer(function(input, output) {
 
     output$plot <- renderPlot({
         data <- similars()
-        plot <- ggplot(data, aes(x=alcohol, y = volatile.acidity))+
-            geom_point(aes(color = sulphates), alpha = 0.3)+
+        predi <- prediction()
+        
+        plot <- ggplot(df, aes(x=alcohol, y = quality))+
+            geom_point(aes(color = volatile.acidity), alpha = 0.3)+
             geom_smooth(method = "glm")+
-            geom_vline(xintercept = input$car, color = "red")+
-            geom_hline(yintercept = pred, color = "green")
-        ggplot(data, aes(gdpPercap, lifeExp)) +
-            geom_point() +
-            scale_x_log10()
+            geom_vline(xintercept = input$alcohol, color = "red")+
+            geom_hline(yintercept = predi, color = "green")
+        
+        plot
     })
-
 })

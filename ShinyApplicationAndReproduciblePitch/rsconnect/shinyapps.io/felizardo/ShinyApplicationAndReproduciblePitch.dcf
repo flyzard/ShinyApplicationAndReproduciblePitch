@@ -1,0 +1,12 @@
+name: ShinyApplicationAndReproduciblePitch
+title: ShinyApplicationAndReproduciblePitch
+username:
+account: felizardo
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 982232
+bundleId: 2155277
+url: https://felizardo.shinyapps.io/ShinyApplicationAndReproduciblePitch/
+when: 1560591211.6881
+asMultiple: FALSE
+asStatic: FALSE
