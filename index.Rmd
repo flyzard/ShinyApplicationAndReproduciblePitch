@@ -30,10 +30,6 @@ The data set can be found in https://www.kaggle.com/sgus1318/winedata.
 
 ** Please be aware that this study serves nothing else as the work for the Course Project. No further conclusion should be taken from this work. **
 
-```{r echo=FALSE, cache=TRUE, warning=FALSE, error=FALSE}
-# Required package
-library("GGally")
-```
 
 --- .imp #imp
 ## Importing data
